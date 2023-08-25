@@ -2,9 +2,13 @@ package org.firstinspires.ftc.teamcode.drive.opmode.roadrunnertune;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.Localizer;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -30,7 +34,9 @@ import java.util.List;
 @Autonomous(group = "drive")
 public class outputEncoderValues extends LinearOpMode {
     private Encoder leftEncoder, rightEncoder, frontEncoder;
-    public static double DISTANCE = 50;
+
+
+    public static double DISTANCE = 10;
 
 
 
@@ -38,7 +44,11 @@ public class outputEncoderValues extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        List<Double> velocities = drive.getWheelVelocities();
+        List<Double> positions = drive.getWheelPositions();
+
+        drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftFront"));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightFront"));
@@ -55,8 +65,19 @@ public class outputEncoderValues extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()) {
+            drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             drive.followTrajectory(trajectoryForward);
+            for (int i = 0; i < velocities.size(); i++) {
+                telemetry.addData("measuredVelocity" + i, velocities.get(i));
+            }
+
+            for (int k = 0; k < positions.size(); k++){
+                telemetry.addData("measured wheel position" + k, positions.get(k));
+            }
+
             drive.followTrajectory(trajectoryBackward);
+            
+            telemetry.update();
         }
     }
 }
