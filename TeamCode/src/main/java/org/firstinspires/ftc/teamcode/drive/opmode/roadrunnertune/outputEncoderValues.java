@@ -37,7 +37,7 @@ import org.firstinspires.ftc.teamcode.drive.opmode.concepts.datalogging.Datalogg
  */
 
 
-@Autonomous(group = "drive")
+@TeleOp(group = "drive")
 public class outputEncoderValues extends LinearOpMode {
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
@@ -52,6 +52,8 @@ public class outputEncoderValues extends LinearOpMode {
         datalog = new Datalog();
 
         imu = hardwareMap.get(IMU.class, "imu");
+
+        battery = hardwareMap.voltageSensor.get("Control Hub");
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
         RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
@@ -112,8 +114,8 @@ public class outputEncoderValues extends LinearOpMode {
             telemetry.addData("Right encoder correct velocity", datalog.rParVelo);
             telemetry.addData("Front encoder correct velocity", datalog.perpVelo);
             telemetry.addLine();
-            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", datalog.yawDegrees);
-            telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", datalog.yawVelo);
+            telemetry.addData("Yaw (Z)", datalog.yawDegrees);
+            telemetry.addData("Yaw (Z) velocity", datalog.yawVelo);
 
             telemetry.update();
         }
